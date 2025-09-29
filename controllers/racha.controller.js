@@ -24,7 +24,9 @@ exports.getRachasDelMes = async (req, res) => {
 
 
     const inicioMes = new Date(fechaBase.getFullYear(), fechaBase.getMonth(), 1, 0, 0, 0);
+    console.log(inicioMes);
     const finMes = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, 1, 0, 0, 0);
+    console.log(finMes);
 
     const rachas = await db.racha.findAll({
       where: {
@@ -40,7 +42,7 @@ exports.getRachasDelMes = async (req, res) => {
     });
 
     if (!rachas || rachas.length === 0) {
-      return res.status(404).json({ msg: "No se encontraron rachas para este mes" });
+      return res.status(404).json({ msg: "No se encontraron rachas para este mes", inicioMes, finMes });
     }
 
     return res.status(200).json({
@@ -61,7 +63,6 @@ function ymd(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-// Diferencia en días entre dos fechas normalizadas
 function diffDays(a, b) {
   const ms = ymd(a) - ymd(b);
   return Math.round(ms / (1000 * 60 * 60 * 24));
@@ -86,11 +87,10 @@ exports.verificarRachaDiaria = async (req, res) => {
     const cfg = await db.fecha.findOne();
     let base = cfg.fechaReal ?? new Date();
     if (cfg && cfg.estaSimulada && cfg.fechaSimulada) {
-      base = new Date(cfg.fechaSimulada);
+      base = cfg.fechaSimulada;
     }
     const hoy = ymd(base);
 
-    // Estado actual de la racha
     const racha = usuario.racha;
     let dias = racha.dias ?? 0;
     let puntos = racha.puntos ?? 0;
@@ -106,7 +106,6 @@ exports.verificarRachaDiaria = async (req, res) => {
       const d = diffDays(hoy, fechaRacha);
 
       if (d === 0) {
-        // mismo día → no hacer nada
         accion = "mismo_dia";
       } else if (d === 1) {
         // día siguiente → aumentar racha

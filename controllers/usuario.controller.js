@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
         }
 
         const newUser = await db.usuario.create({ nombres, apellidos, email, password });
-        const Racha = await db.racha.create({ usuarioId: newUser.id, dias: 0, puntos: 0, estaPrendida: true});
+        const Racha = await db.racha.create({ usuarioId: newUser.id, dias: 0, puntos: 0, estaPrendida: true, fechaId: 1});
         return res.status(201).json({ msg: "Usuario registrado exitosamente", user: newUser });
     } catch (error) {
         console.error("Error en el registro de usuario:", error);
