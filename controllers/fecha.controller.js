@@ -78,12 +78,13 @@ exports.resetFecha = async (req, res) => {
         if (!fecha) {
             return res.status(404).json({ msg: "Fecha no encontrada" });
         }
+        const nuevaFecha = new Date();
         fecha.estaSimulada = false;
         fecha.fechaSimulada = null;
-        fecha.fechaReal = new Date();
+        fecha.fechaReal = nuevaFecha;
         await fecha.save();
         await db.racha.update(
-          { fecha: fechaReal},
+          { fecha: nuevaFecha},
           { where: {} }
         );
         return res.status(200).json({ msg: "Fecha reseteada exitosamente", fecha });
