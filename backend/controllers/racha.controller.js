@@ -114,8 +114,7 @@ exports.verificarRachaDiaria = async (req, res) => {
         accion = "dia_siguiente_sumado";
       } else if (d >= 2) {
         // racha rota → reiniciar
-        dias = 1;            // empieza de nuevo hoy
-        puntos += 1;         // +1 por el login de hoy
+        dias = 0;            // empieza de nuevo hoy
         accion = "racha_rotay_reinicia";
       }
     }
@@ -126,7 +125,10 @@ exports.verificarRachaDiaria = async (req, res) => {
         dias,
         puntos,
         fecha: hoy,
-        estaActiva: true,
+        estaPrendida: true
+      });
+    } else {
+      await racha.update({
         estaPrendida: true
       });
     }

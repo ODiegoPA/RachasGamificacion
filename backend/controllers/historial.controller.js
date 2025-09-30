@@ -9,15 +9,25 @@ exports.crearHistorialYReset = async (req, res) => {
     if (fechaCfg?.estaSimulada && fechaCfg?.fechaSimulada) {
       base = new Date(fechaCfg.fechaSimulada);
     }
-    const anio = base.getFullYear();
-    const mesNum = base.getMonth(); // 0..11
+
+    // Mes anterior al mes base
+    const anioBase = base.getFullYear();
+    const mesBaseNum = base.getMonth(); // 0..11
+
+    let anio = anioBase;
+    let mesNum = mesBaseNum - 1; // mes anterior
+    if (mesNum < 0) {
+      mesNum = 11;       // diciembre
+      anio = anioBase - 1;
+    }
+
     const mes = String(mesNum + 1).padStart(2, "0");
     const inicioMes = new Date(anio, mesNum, 1, 0, 0, 0);
     const finMes = new Date(anio, mesNum + 1, 1, 0, 0, 0);
 
     const { Op } = db.Sequelize;
 
-    // 2) Traer rachas del mes vigente
+    // 2) Traer rachas del MES ANTERIOR
     const rachas = await db.racha.findAll({
       where: { fecha: { [Op.gte]: inicioMes, [Op.lt]: finMes } },
       transaction: t,
@@ -26,10 +36,10 @@ exports.crearHistorialYReset = async (req, res) => {
 
     if (!rachas || rachas.length === 0) {
       await t.rollback();
-      return res.status(404).json({ msg: "No hay rachas en el mes vigente", mes, anio });
+      return res.status(404).json({ msg: "No hay rachas en el mes anterior", mes, anio });
     }
 
-    // 3) Crear/actualizar historial por usuario para (mes, año)
+    // 3) Crear/actualizar historial por usuario para (mes anterior, año correspondiente)
     const ahora = new Date();
     let creados = 0, actualizados = 0;
 
@@ -59,7 +69,7 @@ exports.crearHistorialYReset = async (req, res) => {
       }
     }
 
-    // 4) Resetear TODAS las rachas (no solo las del mes)
+    // 4) Resetear TODAS las rachas (no solo las del período)
     await db.racha.update(
       {
         dias: 0,
@@ -74,7 +84,7 @@ exports.crearHistorialYReset = async (req, res) => {
     await t.commit();
 
     return res.status(201).json({
-      msg: "Historial generado y rachas reseteadas",
+      msg: "Historial del mes anterior generado y rachas reseteadas",
       mes,
       anio,
       creados,
@@ -87,6 +97,7 @@ exports.crearHistorialYReset = async (req, res) => {
     return res.status(500).json({ msg: "Error en el servidor" });
   }
 };
+
 
 
 exports.getPuntosHistoricos = async (req, res) => {

@@ -6,9 +6,6 @@ module.exports = (sequelize, Sequelize) => {
         puntos: {
             type: Sequelize.INTEGER
         },
-        estaActiva: {
-            type: Sequelize.BOOLEAN
-        },
         estaPrendida: {
             type: Sequelize.BOOLEAN
         },

@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import rachaLogo from './racha.png'
 import './MainMenu.css'
 const NavMainMenu = () => {
+    const userSaved = localStorage.getItem("user");
+    const parsed = userSaved ? JSON.parse(userSaved) : null;
+    const user = parsed?.user || parsed || { isAdmin: 0 };
+
+    console.log("User in NavMainMenu:", user.isAdmin);
     const navigate = useNavigate();
     const handleLogout = () => {
         localStorage.removeItem("user");
@@ -26,6 +31,11 @@ const NavMainMenu = () => {
                 <Nav className="mr-auto">
                     <Link className="nav-link" to={"/historial"}>Historial </Link>
                 </Nav>
+                {user.isAdmin && (
+                <Nav className="mr-auto">
+                    <Link className="nav-link" to={"/admin"}>Configuracion </Link>
+                </Nav>
+                )}
                     <Link variant="outline-light" className="nav-button" onClick={handleLogout}>
                     Cerrar Sesion
                 </Link>
