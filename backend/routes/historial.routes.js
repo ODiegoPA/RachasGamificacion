@@ -4,6 +4,6 @@ module.exports = app => {
 
     router.post("/generar", controller.crearHistorialYReset);
     router.get("/puntos", controller.getPuntosHistoricos);
-    router.get("/periodo", controller.getHistorialPorPeriodo);
+    router.post("/periodo", controller.getHistorialPorPeriodo);
     app.use('/historial', router);
 }

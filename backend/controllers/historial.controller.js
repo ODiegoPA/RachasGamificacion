@@ -144,7 +144,7 @@ exports.getPuntosHistoricos = async (req, res) => {
 
 exports.getHistorialPorPeriodo = async (req, res) => {
   try {
-    let { mes, ano } = req.body; // mes puede venir como "09" o 9
+    let { mes, ano } = req.body;
 
     if (mes == null || ano == null) {
       return res.status(400).json({ msg: "Debe enviar 'mes' (1-12) y 'ano' en el body." });
@@ -165,7 +165,7 @@ exports.getHistorialPorPeriodo = async (req, res) => {
     // 1) Trae TODOS los registros del historial para ese periodo
     const registros = await db.historial.findAll({
       where: { mes: mesStr, ano: anoNum },
-      order: [["usuarioId", "ASC"], ["fechaUltimaActualizacion", "DESC"]],
+      order: [["puntos", "DESC"], ["dias", "DESC"]],
       // include: [{ model: db.usuario, as: "usuario", attributes: ["id", "nombre", "email"] }], // opcional
     });
 
@@ -194,7 +194,7 @@ exports.getHistorialPorPeriodo = async (req, res) => {
         diasTotales: Number(r.diasTotales),
         registros: Number(r.registros),
       })),
-      data: registros, // puedes omitirlo si solo querés el resumen
+      data: registros,
     });
   } catch (error) {
     console.error("Error al listar historial por período (general):", error);

@@ -12,9 +12,6 @@ module.exports = (sequelize, Sequelize) => {
         ano: {
             type: Sequelize.INTEGER
         },
-        fechaUltimaActualizacion: {
-            type: Sequelize.DATE
-        },
     });
     return Historial;
 }

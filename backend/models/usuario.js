@@ -12,8 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         password: {
             type: Sequelize.STRING
         },
-        ultimoLogin: {
-            type: Sequelize.DATE
+        isAdmin: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
         },
     });
     return Usuario;

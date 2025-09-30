@@ -37,8 +37,8 @@ exports.getRachasDelMes = async (req, res) => {
       },
       include: [
         { model: db.usuario, as: "usuario" },
-        { model: db.fecha, as: "fechaCfg" },
       ],
+      order: [['puntos', 'DESC'], ['dias', 'DESC']],
     });
 
     if (!rachas || rachas.length === 0) {
