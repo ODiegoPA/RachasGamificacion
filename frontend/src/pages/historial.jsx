@@ -23,7 +23,6 @@ const HistorialPage = () => {
 
   const [periodo, setPeriodo] = useState({ mes: null, ano: null });
   const [resumen, setResumen] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -64,6 +63,15 @@ const HistorialPage = () => {
   } finally {
     setLoading(false);
   }
+};
+
+//funcion pura
+const nombreDe = (usuarioId) => {
+    const h = data.find(x => x.usuarioId === usuarioId);
+    const nom = h?.usuario?.nombres || "";
+    const ape = h?.usuario?.apellidos || "";
+    const full = `${nom} ${ape}`.trim();
+    return full || `Usuario ${usuarioId}`;
 };
 
 
@@ -122,7 +130,7 @@ const HistorialPage = () => {
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>UsuarioId</th>
+                        <th>Usuario</th>
                         <th className="text-center">Puntos totales</th>
                         <th className="text-center">Días totales</th>
                       </tr>
@@ -131,7 +139,7 @@ const HistorialPage = () => {
                       {resumen.map((r, idx) => (
                         <tr key={r.usuarioId}>
                           <td>{idx + 1}</td>
-                          <td>{r.usuarioId}</td>
+                          <td>{nombreDe(r.usuarioId)}</td>
                           <td className="text-center"><Badge bg="primary">{r.puntosTotales ?? 0}</Badge></td>
                           <td className="text-center">{r.diasTotales ?? 0}</td>
                         </tr>

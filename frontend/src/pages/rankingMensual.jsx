@@ -36,6 +36,7 @@ const RankingsPage = () => {
       const { data } = await axios.get("http://localhost:3000/racha/mes");
       setMes(data?.mes ?? null);
       setAnio(data?.anio ?? null);
+      //inmutabilidad
       const list = Array.isArray(data?.rachas) ? data.rachas.slice(0, 10) : [];
       setItems(list);
     } catch (err) {

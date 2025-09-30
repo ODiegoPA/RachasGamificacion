@@ -3,21 +3,19 @@ const db = require("../models");
 exports.crearHistorialYReset = async (req, res) => {
   const t = await db.sequelize.transaction();
   try {
-    // 1) Fecha base (simulada si aplica)
     const fechaCfg = await db.fecha.findOne({ transaction: t });
     let base = new Date();
     if (fechaCfg?.estaSimulada && fechaCfg?.fechaSimulada) {
       base = new Date(fechaCfg.fechaSimulada);
     }
 
-    // Mes anterior al mes base
     const anioBase = base.getFullYear();
-    const mesBaseNum = base.getMonth(); // 0..11
+    const mesBaseNum = base.getMonth();
 
     let anio = anioBase;
-    let mesNum = mesBaseNum - 1; // mes anterior
+    let mesNum = mesBaseNum - 1;
     if (mesNum < 0) {
-      mesNum = 11;       // diciembre
+      mesNum = 11;
       anio = anioBase - 1;
     }
 
@@ -27,7 +25,6 @@ exports.crearHistorialYReset = async (req, res) => {
 
     const { Op } = db.Sequelize;
 
-    // 2) Traer rachas del MES ANTERIOR
     const rachas = await db.racha.findAll({
       where: { fecha: { [Op.gte]: inicioMes, [Op.lt]: finMes } },
       transaction: t,
@@ -39,7 +36,6 @@ exports.crearHistorialYReset = async (req, res) => {
       return res.status(404).json({ msg: "No hay rachas en el mes anterior", mes, anio });
     }
 
-    // 3) Crear/actualizar historial por usuario para (mes anterior, año correspondiente)
     const ahora = new Date();
     let creados = 0, actualizados = 0;
 
@@ -69,14 +65,12 @@ exports.crearHistorialYReset = async (req, res) => {
       }
     }
 
-    // 4) Resetear TODAS las rachas (no solo las del período)
     await db.racha.update(
       {
         dias: 0,
         puntos: 0,
         estaPrendida: false,
-        estaActiva: false,   // opcional, si existe el campo
-        fecha: null,         // para evitar comparaciones con fecha vieja
+        fecha: null,
       },
       { where: {}, transaction: t }
     );
@@ -107,7 +101,6 @@ exports.getPuntosHistoricos = async (req, res) => {
     const { fn, col, literal } = db.Sequelize;
 
     if (usuarioId) {
-      // Suma (y opcional: suma de días) para un usuario
       const agg = await db.historial.findOne({
         attributes: [
           [fn("COALESCE", fn("SUM", col("puntos")), 0), "puntosTotales"],
@@ -126,7 +119,6 @@ exports.getPuntosHistoricos = async (req, res) => {
       });
     }
 
-    // Suma agrupada por usuario (todos)
     const filas = await db.historial.findAll({
       attributes: [
         "usuarioId",
@@ -168,19 +160,16 @@ exports.getHistorialPorPeriodo = async (req, res) => {
       return res.status(400).json({ msg: "Parámetros inválidos: 'mes' 1..12 y 'ano' numérico." });
     }
 
-    // En historial guardas mes como STRING con 2 dígitos (p.ej., "09")
     const mesStr = String(mesNum).padStart(2, "0");
 
     const { fn, col, literal } = db.Sequelize;
 
-    // 1) Trae TODOS los registros del historial para ese periodo
     const registros = await db.historial.findAll({
       where: { mes: mesStr, ano: anoNum },
       order: [["puntos", "DESC"], ["dias", "DESC"]],
-      // include: [{ model: db.usuario, as: "usuario", attributes: ["id", "nombre", "email"] }], // opcional
+      include: [{ model: db.usuario, as: "usuario", attributes: ["id", "nombres", "apellidos", "email"] }],
     });
 
-    // 2) Resumen agrupado por usuario
     const resumen = await db.historial.findAll({
       attributes: [
         "usuarioId",

@@ -58,11 +58,12 @@ exports.getRachasDelMes = async (req, res) => {
 };
 
 
-// Normalizar fecha a AAAA-MM-DD (sin hora)
+//funcion pura
 function ymd(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+//funcion pura
 function diffDays(a, b) {
   const ms = ymd(a) - ymd(b);
   return Math.round(ms / (1000 * 60 * 60 * 24));
@@ -114,7 +115,7 @@ exports.verificarRachaDiaria = async (req, res) => {
         accion = "dia_siguiente_sumado";
       } else if (d >= 2) {
         // racha rota → reiniciar
-        dias = 0;            // empieza de nuevo hoy
+        dias = 0;
         accion = "racha_rotay_reinicia";
       }
     }

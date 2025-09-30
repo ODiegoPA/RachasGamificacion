@@ -18,7 +18,7 @@ const AdminPage = () => {
   // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(null);
   const [fecha, setFecha] = useState(null);
-  const [fechaSimulada, setFechaSimulada] = useState(""); // YYYY-MM-DD
+  const [fechaSimulada, setFechaSimulada] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
   const [error, setError] = useState(null);
@@ -50,9 +50,8 @@ const AdminPage = () => {
   const cargarFecha = async () => {
     try {
       const { data } = await axios.get("http://localhost:3000/fecha");
-      const f = data?.fecha || data; // por si tu endpoint devuelve { fecha: {...} } o directo
+      const f = data?.fecha || data;
       setFecha(f || {});
-      // Prellenar el datepicker con la simulada actual si existe
       setFechaSimulada(toYmd(f?.fechaSimulada));
     // eslint-disable-next-line no-unused-vars
     } catch (e) {
@@ -69,7 +68,7 @@ const AdminPage = () => {
       setLoading(true);
       setError(null);
       const { data } = await axios.post("http://localhost:3000/fecha/modificar", {
-        fechaSimulada, // debe ser "YYYY-MM-DD"
+        fechaSimulada,
       });
       setMsg(data?.msg || "Fecha modificada exitosamente.");
     } catch (e) {

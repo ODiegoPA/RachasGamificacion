@@ -14,19 +14,16 @@ exports.createFecha = async (req, res) => {
         return res.status(500).json({ msg: "Error en el servidor" });
     }
 };
-// Helper: normaliza a mediodía local si viene 'YYYY-MM-DD'
+//funcion pura
 function normalizeToLocalNoon(input) {
   if (typeof input === 'string') {
     const m = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (m) {
       const [, y, mo, d] = m;
-      // Mediodía LOCAL para evitar que el midnight UTC te “retroceda” un día
       return new Date(Number(y), Number(mo) - 1, Number(d), 12, 0, 0, 0);
     }
-    // Si trae hora o es otro formato válido, que JS lo parsee
     return new Date(input);
   }
-  // Si ya es Date u otro tipo
   return new Date(input);
 }
 
@@ -46,17 +43,12 @@ exports.modificarFecha = async (req, res) => {
         return res.status(400).json({ msg: "fechaSimulada inválida" });
       }
 
-      // Puedes guardar como Date directamente...
       fecha.fechaSimulada = normalized; 
-      // ...o si prefieres ISO:
-      // fecha.fechaSimulada = normalized.toISOString();
-
       fecha.estaSimulada = true;
     }
 
     await fecha.save();
 
-    // Al cambiar la fecha, apagar todas las rachas
     await db.racha.update(
       { estaPrendida: false },
       { where: {} }
@@ -120,7 +112,6 @@ exports.cambioDia = async (req, res) => {
   try {
     const fechaCfg = await db.fecha.findOne();
 
-    // Caso 1: simulada → todas falsas directamente
     if (fechaCfg && fechaCfg.estaSimulada && fechaCfg.fechaSimulada) {
       await db.racha.update({ estaPrendida: false }, { where: {} });
       return res.status(200).json({

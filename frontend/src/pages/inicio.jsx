@@ -44,7 +44,8 @@ const InicioPage = () => {
     }
   };
 
-  // Mapea la "accion" del backend a un pop-up amigable
+  //funcion pura
+  //inmutabilidad
   const buildPopupFromAccion = (accion, r) => {
     const dias = r?.dias ?? 0;
     const puntos = r?.puntos ?? 0;
